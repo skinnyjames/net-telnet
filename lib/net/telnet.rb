@@ -524,6 +524,7 @@ module Net
     #           EOFError will be raised. Otherwise, defaults to the old
     #           behaviour that the function will return whatever data
     #           has been received already, or nil if nothing was received.
+    # WaitLines:: Number of lines to wait for before breaking the connection.
     #
     def waitfor(options) # :yield: recvdata
       time_out = @options["Timeout"]
