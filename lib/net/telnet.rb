@@ -529,6 +529,7 @@ module Net
       time_out = @options["Timeout"]
       waittime = @options["Waittime"]
       fail_eof = @options["FailEOF"]
+      wait_lines = nil
 
       if options.kind_of?(Hash)
         prompt   = if options.has_key?("Match")
@@ -541,6 +542,7 @@ module Net
         time_out = options["Timeout"]  if options.has_key?("Timeout")
         waittime = options["Waittime"] if options.has_key?("Waittime")
         fail_eof = options["FailEOF"]  if options.has_key?("FailEOF")
+        wait_lines = options["Waitlines"] if options.has_key("Waitlines")
       else
         prompt = options
       end
@@ -549,10 +551,14 @@ module Net
         time_out = nil
       end
 
+      lines = []
       line = ''
       buf = ''
       rest = ''
-      until(prompt === line and not @sock.wait_readable(waittime))
+      until(prompt === line ||  and not @sock.wait_readable(waittime))
+        if lines.size === wait_lines 
+          self.write("\x03")
+        end
         unless @sock.wait_readable(time_out)
           raise Net::ReadTimeout, "timed out while waiting for more data"
         end
@@ -590,6 +596,7 @@ module Net
           end
           @log.print(buf) if @options.has_key?("Output_log")
           line += buf
+          lines << line
           yield buf if block_given?
         rescue EOFError # End of file reached
           raise if fail_eof
