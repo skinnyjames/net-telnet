@@ -555,12 +555,14 @@ module Net
       line = ''
       buf = ''
       rest = ''
-      until(prompt === line ||  and not @sock.wait_readable(waittime))
-        if lines.size === wait_lines 
-          self.write("\x03")
-        end
+      until(prompt === line and not @sock.wait_readable(waittime))
         unless @sock.wait_readable(time_out)
           raise Net::ReadTimeout, "timed out while waiting for more data"
+        end
+        # break for max Waitlines
+        if lines.size === wait_lines 
+          self.cmd("\x03"){|c| yield c }
+          break
         end
         begin
           c = @sock.readpartial(1024 * 1024)
