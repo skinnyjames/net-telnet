@@ -544,7 +544,7 @@ module Net
         waittime = options["Waittime"] if options.has_key?("Waittime")
         fail_eof = options["FailEOF"]  if options.has_key?("FailEOF")
         wait_lines = options["Waitlines"] if options.has_key?("Waitlines")
-        sleep = options.has_key("Sleep") ? options["Sleep"] : 10
+        sleep = options.has_key?("Sleep") ? options["Sleep"] : 10
       else
         prompt = options
       end
